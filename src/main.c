@@ -70,6 +70,13 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 void StartDefaultTask(void const * argument);
 
+//Functions that help send/receive text through serial
+void newLine();
+void clrScr();
+void printStr(char text_to_print[]);
+void printNum(int number_to_print);
+void readInput(char buffer_to_hold_text[], uint16_t size_of_input);
+
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
@@ -153,6 +160,30 @@ int main(void)
   }
   /* USER CODE END 3 */
 
+}
+
+//Functions to help display/read text easier
+void newLine() { //Basically prints a new line and moves cursor all the way to the left
+	HAL_UART_Transmit(&huart2, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+}
+
+void clrScr() { // Clears the screen. Moves cursor to 0,0
+	HAL_UART_Transmit(&huart2, (uint8_t*)"\033[0;0H", strlen("\033[0;0H"), HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart2, (uint8_t*)"\033[2J", strlen("\033[2J"), HAL_MAX_DELAY);
+}
+
+void printStr(char str[]) { //Prints the string that is passed into it
+	HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
+}
+
+void printNum (int num) { //Prints number that is passed here (max of 20 in length atm)
+	char buff[20];
+	sprintf(buff, "%i", num);
+	printStr(buff);
+}
+
+void readInput(char buff[], uint16_t size) { //Reads user input into buffer that is passed
+	HAL_UART_Receive(&huart2, buff, size, HAL_MAX_DELAY);
 }
 
 /** System Clock Configuration
